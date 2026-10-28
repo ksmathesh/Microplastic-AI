@@ -1,0 +1,13 @@
+services:
+  aquasentinel:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      MODEL_PATH: /app/weights/best.pt
+      DATABASE_URL: sqlite:////app/storage/aquasentinel.db
+      MAX_UPLOAD_MB: 15
+    volumes:
+      - ./storage:/app/storage
+      - ./weights:/app/weights:ro
+    restart: unless-stopped

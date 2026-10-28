@@ -1,0 +1,11 @@
+.git
+.env
+.venv
+__pycache__
+*.py[cod]
+storage/*
+!storage/uploads/.gitkeep
+!storage/processed/.gitkeep
+runs
+weights/*.pt
+data/Microplastic.v5i.yolov8
