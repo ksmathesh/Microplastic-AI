@@ -7,5 +7,5 @@ storage/*
 !storage/uploads/.gitkeep
 !storage/processed/.gitkeep
 runs
-weights/*.pt
+weights/*.onnx
 data/Microplastic.v5i.yolov8
