@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: aquasentinel-api
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /api/status
+    autoDeploy: false
+    envVars:
+      - key: STORAGE_DIR
+        value: /var/data
+      - key: MAX_UPLOAD_MB
+        value: "15"
+      - key: CORS_ORIGINS
+        value: https://microplastic-ai-frontend-abod3n3ov-code-alpha12.vercel.app
