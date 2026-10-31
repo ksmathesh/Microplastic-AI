@@ -1,2 +1,2 @@
-// Set by the deployment after the Render API service is created.
-window.AQUASENTINEL_API_BASE = "";
+// AquaSentinel API hosted on Render.
+window.AQUASENTINEL_API_BASE = "https://aquasentinel-api-0ptc.onrender.com";
