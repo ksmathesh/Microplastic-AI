@@ -6,14 +6,21 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
 
 ROOT=Path(__file__).resolve().parents[1]
-STORE=ROOT/"storage"; UPLOADS=STORE/"uploads"; RESULTS=STORE/"processed"
+STORE=Path(os.getenv("STORAGE_DIR",str(ROOT/"storage")))
+if not STORE.is_absolute(): STORE=(ROOT/STORE).resolve()
+UPLOADS=STORE/"uploads"; RESULTS=STORE/"processed"
 for folder in (UPLOADS,RESULTS): folder.mkdir(parents=True,exist_ok=True)
-DB=Path(os.getenv("DATABASE_URL","sqlite:///./storage/aquasentinel.db").removeprefix("sqlite:///"))
-if not DB.is_absolute(): DB=(ROOT/DB).resolve()
+DATABASE_URL=os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    DB=Path(DATABASE_URL.removeprefix("sqlite:///"))
+    if not DB.is_absolute(): DB=(ROOT/DB).resolve()
+else:
+    DB=STORE/"aquasentinel.db"
 LIMIT=int(os.getenv("MAX_UPLOAD_MB","15"))
 MODEL_PATH=Path(os.getenv("MODEL_PATH",str(ROOT/"weights"/"best.pt")))
 MODEL: Any|None=None
@@ -45,6 +52,8 @@ async def lifespan(app):
     yield
 
 app=FastAPI(title="AquaSentinel AI",description="Image-based screening of suspected microplastic particles.",version="0.1.0",lifespan=lifespan)
+origins=[origin.strip() for origin in os.getenv("CORS_ORIGINS","*").split(",") if origin.strip()]
+app.add_middleware(CORSMiddleware,allow_origins=origins,allow_methods=["GET","POST","OPTIONS"],allow_headers=["*"])
 
 def serialize(row):
     d=dict(row); d["classes"]=json.loads(d.pop("classes_json")); d["detections"]=json.loads(d.pop("detections_json"))
